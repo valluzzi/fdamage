@@ -12,7 +12,7 @@ set version=0.0.%v%
 
 
 :: replace the version number in package.json
-echo from distutils.core import setup>setup.bkp
+echo from setuptools import setup, find_packages>setup.bkp
 echo.>>setup.bkp
 echo VERSION = "%version%">>setup.bkp
 :: copy the file from line 3 to the end of the file avoid last line
