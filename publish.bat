@@ -19,7 +19,10 @@ echo VERSION = "%version%">>setup.bkp
 type setup.py | more +3>>setup.bkp
 
 :: replace the file
-rename setup.bkp setup.py
+copy setup.bkp setup.py
+
+:: remove the backup file
+del setup.bkp
 
 :: write the version number to the file
 echo v %version%
