@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.2"
-PACKAGE_NAME = "fdamage"
+VERSION = "0.0.3"
+PACKAGE_NAME = "fdamages"
 AUTHOR = "Valerio Luzzi"
 EMAIL = "valerio.luzzi@gecosistema.com"
 GITHUB = f"https://github.com/valluzzi/{PACKAGE_NAME}.git"
@@ -28,6 +28,7 @@ setup(
     ],
     install_requires=[ "boto3" ]
 )
+
 
 
 
