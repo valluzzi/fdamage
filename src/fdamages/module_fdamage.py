@@ -1,4 +1,5 @@
 import boto3
+import requests
 from botocore.response import StreamingBody
 
 # fdamage text format
@@ -42,6 +43,8 @@ def normalize_text(text):
         s3 = boto3.client('s3')
         bucket, key = text.split('s3://')[1].split('/', 1)
         text = normalize_text(s3.get_object(Bucket=bucket, Key=key))
+    elif isinstance(text, str) and text.startswith("https://"):
+        text = normalize_text(requests.get(text).text)
     elif isinstance(text, str):
         text = text.replace('\r\n', '\n').replace('\r', '\n')
     elif isinstance(text, bytes):
@@ -50,7 +53,6 @@ def normalize_text(text):
         text = normalize_text(text.read())
     elif isinstance(text, dict) and "Body" in text:
         text = normalize_text(text["Body"])
-    
     return text
 
 
@@ -87,6 +89,9 @@ if __name__ == '__main__':
     text = f_example
     #arr = parse_fdamage(text)
     
-    arr = parse_fdamage("s3://saferplaces.co/fdamage/shared/residential.csv")
+    uri = "s3://saferplaces.co/fdamage/shared/residential.csv" 
+    uri = "https://s3.amazonaws.com/saferplaces.co/fdamage/shared/default.csv"
+
+    arr = parse_fdamage(uri)
     
     print(arr)
