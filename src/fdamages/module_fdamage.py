@@ -1,3 +1,4 @@
+import os
 import boto3
 import requests
 from botocore.response import StreamingBody
@@ -22,6 +23,25 @@ f_example = """wd,dmg #header is optional
 8,1.2
 """
 
+def normpath(pathname):
+    """
+    normpath
+    """
+    if not pathname:
+        return ""
+    pathname = os.path.normpath(pathname.replace("\\", "/")).replace("\\", "/")
+    pathname = pathname.replace(":/", "://") #patch for s3:// and http:// https://
+    return pathname
+
+
+def juststem(pathname):
+    """
+    juststem
+    """
+    pathname = os.path.basename(pathname)
+    root, _ = os.path.splitext(pathname)
+    return root
+
 
 def parseFloat(x):
     """
@@ -31,7 +51,7 @@ def parseFloat(x):
         return float(x)
     except ValueError:
         return None
-    
+
 
 def normalize_text(text):
     """
@@ -53,6 +73,8 @@ def normalize_text(text):
         text = normalize_text(text.read())
     elif isinstance(text, dict) and "Body" in text:
         text = normalize_text(text["Body"])
+    elif isinstance(text, (list,tuple)):
+        text = "\n".join([f"{x},{y}" for x,y in text])
     return text
 
 
@@ -85,13 +107,77 @@ def parse_fdamage(text):
     return res
 
 
-if __name__ == '__main__':
-    text = f_example
-    #arr = parse_fdamage(text)
-    
-    uri = "s3://saferplaces.co/fdamage/shared/residential.csv" 
-    uri = "https://s3.amazonaws.com/saferplaces.co/fdamage/shared/default.csv"
+def list_fdamages(bucket="saferplaces.co", prefix ="fdamage/"):
+    """
+    List all fdamages
+    """
+    res =[]
+    s3 = boto3.client('s3')
+    # list all files using paginator to avoid limit of 1000 items list only folder fdamges
+    paginator = s3.get_paginator('list_objects')
+    for result in paginator.paginate(Bucket=bucket, Prefix=prefix):
+        for content in result.get('Contents', []):
+            key = content['Key']
+            if key.endswith(".csv"):
+                res.append(key)
+    return res
 
-    arr = parse_fdamage(uri)
+
+def upsert(key, arr):
+    """
+    Upsert fdamage
+    """
+    bucket="saferplaces.co"
+    try:
+        s3 = boto3.client('s3')
+        arr = parse_fdamage(arr)
+        text = "wd,dmg\n"+ "\n".join([f"{x},{y}" for x,y in arr])
+        s3.put_object(Bucket=bucket, Key=key, Body=text)
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def upsert_fdamage(name, arr, username=""):
+    """
+    Upsert user fdamage
+    """
+    if username == "":
+        username = "shared"
+    # TODO
+    # check that the user key exists
+    key = f"fdamage/{username}/{juststem(name)}.csv"
+    return upsert(key, arr)
+
+
+def delete_fdamage(name, username=""):
+    """
+    Delete fdamage
+    """
+    bucket="saferplaces.co"
+    if username:
+        key = f"fdamage/{username}/{juststem(name)}.csv"
+        try:
+            s3 = boto3.client('s3')
+            s3.delete_object(Bucket=bucket, Key=key)
+            return True
+        except Exception as e:
+            print(e)
+    return False
+
+if __name__ == '__main__':
     
-    print(arr)
+    arr = parse_fdamage(f_example)
+    #upsert_user_fdamage("myfunc", arr, "valluzzi@gmail.com")
+    #print("upsert_fdamage done")
+
+    delete_fdamage("myfunc", "valluzzi@gmail.com")
+    print("delete_fdamage done")
+    
+
+
+    arr = list_fdamages(prefix = "fdamage/valluzzi@gmail.com")
+    for i in arr:
+        print(i)
+
