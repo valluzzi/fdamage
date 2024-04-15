@@ -1,3 +1,4 @@
+import boto3
 from botocore.response import StreamingBody
 
 # fdamage text format
@@ -37,6 +38,10 @@ def normalize_text(text):
     """
     if text is None:
         text = ""
+    elif isinstance(text, str) and text.startswith("s3://"):
+        s3 = boto3.client('s3')
+        bucket, key = text.split('s3://')[1].split('/', 1)
+        text = normalize_text(s3.get_object(Bucket=bucket, Key=key))
     elif isinstance(text, str):
         text = text.replace('\r\n', '\n').replace('\r', '\n')
     elif isinstance(text, bytes):
@@ -80,5 +85,8 @@ def parse_fdamage(text):
 
 if __name__ == '__main__':
     text = f_example
-    arr = parse_fdamage(text)
-    print(arr) 
+    #arr = parse_fdamage(text)
+    
+    arr = parse_fdamage("s3://saferplaces.co/fdamage/shared/residential.csv")
+    
+    print(arr)
