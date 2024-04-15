@@ -1,1 +1,1 @@
-from .module_fdamage import parse_fdamage, upsert_fdamage, delete_fdamage
+from .module_fdamage import parse_fdamage, upsert_fdamage, delete_fdamage, list_fdamages
