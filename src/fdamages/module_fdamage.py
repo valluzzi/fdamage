@@ -119,7 +119,10 @@ def list_fdamages(bucket="saferplaces.co", prefix ="fdamage/"):
         for content in result.get('Contents', []):
             key = content['Key']
             if key.endswith(".csv"):
-                res.append(key)
+                res.append({
+                    "name": juststem(key),
+                    "value": key,
+                })
     return res
 
 
