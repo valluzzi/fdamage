@@ -96,9 +96,18 @@ def parse_fdamage(text):
     # sort by x
     res = sorted(res, key=lambda x: x[0])
 
+    # if some values is beetwen 0 and 100 convert to percentage
+    convert_to_percentage = False
+    for _,y in res:
+        if y > 1 and y <= 100:
+            convert_to_percentage = True
+            break
+    if convert_to_percentage:
+        res = [(x, y/100) for x,y in res]
+        
     # paranoid check
     # check that all x are positive, exclude all items that are not positive
-    res = [(x,y) for x,y in res if x > 0 and y >= 0 and y <= 1.0]
+    res = [(x,y) for x,y in res if x > 0 and y >= 0 and y <= 1]
 
     # add (0,0) to the beginning if it is not there
     if len(res) >0 and  res[0][0] != 0:
