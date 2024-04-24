@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = "0.0.12"
+VERSION = "0.0.13"
 PACKAGE_NAME = "fdamages"
 AUTHOR = "Valerio Luzzi"
 EMAIL = "valerio.luzzi@gecosistema.com"
@@ -28,6 +28,7 @@ setup(
     ],
     install_requires=[ "boto3", "requests" ]
 )
+
 
 
 
