@@ -134,7 +134,7 @@ def list_fdamages(bucket="saferplaces.co", prefix ="fdamage/"):
                 res.append({
                     "name": juststem(key),
                     "value": key,
-                    "custom": ("shared/" in key)
+                    "custom": ("shared/" not in key)
                 })
     return res
 
