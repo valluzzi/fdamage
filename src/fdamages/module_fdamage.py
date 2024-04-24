@@ -188,8 +188,12 @@ def delete_fdamage(name, username=""):
                 "custom": ("shared/" not in key)
             }
         except Exception as e:
-            print(e)
-    return None
+            return {
+                "exception": f"{e}"
+            }
+    return {
+        "exception": "username not provided"
+    }
 
 if __name__ == '__main__':
     
