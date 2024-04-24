@@ -149,10 +149,15 @@ def upsert(key, arr):
         arr = parse_fdamage(arr)
         text = "wd,dmg\n"+ "\n".join([f"{x},{y}" for x,y in arr])
         s3.put_object(Bucket=bucket, Key=key, Body=text)
-        return True
+        return {
+            "name": juststem(key),
+            "value": key,
+            "custom": ("shared/" not in key)
+        }
     except Exception as e:
         print(e)
-        return False
+        
+    return None
 
 
 def upsert_fdamage(name, arr, username=""):
@@ -184,7 +189,7 @@ def delete_fdamage(name, username=""):
             }
         except Exception as e:
             print(e)
-    return False
+    return None
 
 if __name__ == '__main__':
     
