@@ -177,7 +177,11 @@ def delete_fdamage(name, username=""):
         try:
             s3 = boto3.client('s3')
             s3.delete_object(Bucket=bucket, Key=key)
-            return True
+            return {
+                "name": juststem(key),
+                "value": key,
+                "custom": ("shared/" not in key)
+            }
         except Exception as e:
             print(e)
     return False
