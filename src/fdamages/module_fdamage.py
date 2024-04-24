@@ -64,8 +64,7 @@ def normalize_text(text):
             s3 = boto3.client('s3')
             bucket, key = text.split('s3://')[1].split('/', 1)
             text = normalize_text(s3.get_object(Bucket=bucket, Key=key))
-        except Exception as e:
-            print(e)
+        except Exception:
             text = ""
     elif isinstance(text, str) and text.startswith("https://"):
         text = normalize_text(requests.get(text).text)
@@ -135,6 +134,7 @@ def list_fdamages(bucket="saferplaces.co", prefix ="fdamage/"):
                 res.append({
                     "name": juststem(key),
                     "value": key,
+                    "custom": ("shared/" in key)
                 })
     return res
 
